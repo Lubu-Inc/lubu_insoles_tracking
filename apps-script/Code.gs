@@ -98,6 +98,23 @@ function handleGetInsoles() {
   if (data.length <= 1) return { success: true, data: [] };
 
   const headers = data[0];
+
+  // Validate headers match expected order
+  const expectedHeaders = ['id', 'serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes', 'dateAdded', 'dateSent', 'lastModified'];
+  const headerMismatch = [];
+  for (let i = 0; i < expectedHeaders.length; i++) {
+    if (headers[i] !== expectedHeaders[i]) {
+      headerMismatch.push(`Column ${i + 1}: expected "${expectedHeaders[i]}", got "${headers[i]}"`);
+    }
+  }
+
+  if (headerMismatch.length > 0) {
+    return {
+      success: false,
+      error: 'Sheet headers do not match expected format. Issues: ' + headerMismatch.join('; ')
+    };
+  }
+
   const insoles = [];
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
@@ -165,7 +182,7 @@ function handleAddInsole(data) {
       data.enclosure || 'New',    // enclosure
       data.pairStatus || 'Both',  // pairStatus
       data.notes || '',
-      now,                    // dateAdded
+      data.dateAdded || now,  // dateAdded (use provided or default to now)
       data.dateSent || '',    // dateSent
       now,                    // lastModified
     ];

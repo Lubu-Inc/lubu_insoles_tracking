@@ -70,7 +70,7 @@ document.addEventListener('alpine:init', () => {
     // ── Computed-like getters ───────────────────────────────────────────────
 
     get stats() {
-      const all = this.insoles;
+      const all = this.filtered; // Use filtered insoles so stats reflect active filters
       const sizes = {};
       Utils.getSizes().forEach(s => {
         sizes[s.code] = all.filter(i => i.size === s.code).length;
@@ -246,13 +246,15 @@ document.addEventListener('alpine:init', () => {
 
     openDrawer() {
       // Only for adding new insoles
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format for date input
       this.form = {
         serialNumber: '',
         type: 'Core',
         size: 'C',
-        location: '',
+        location: 'Ahmed',
         enclosure: 'New',
         pairStatus: 'Both',
+        dateAdded: today,
         dateSent: '',
         notes: '',
       };
@@ -340,6 +342,7 @@ document.addEventListener('alpine:init', () => {
         location: this.form.location,
         enclosure: this.form.enclosure,
         pairStatus: this.form.pairStatus,
+        dateAdded: this.form.dateAdded ? new Date(this.form.dateAdded).toISOString() : Utils.nowISO(),
         dateSent: this.form.dateSent ? new Date(this.form.dateSent).toISOString() : '',
         notes: this.form.notes,
       };
@@ -352,7 +355,6 @@ document.addEventListener('alpine:init', () => {
           if (result.data) data.id = result.data.id;
         }
 
-        data.dateAdded = Utils.nowISO();
         data.lastModified = Utils.nowISO();
         data._highlight = true;
         this.insoles.push(data);
