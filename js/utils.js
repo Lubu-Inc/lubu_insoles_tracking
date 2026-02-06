@@ -73,8 +73,56 @@ const Utils = {
   },
 
   // ── Badge / Status Colors ──────────────────────────────────────────────────
-  TEAM_MEMBERS: ['Ahmed', 'Luca'],
-  CLIENTS: ['Spire', 'HAUHSU'],
+  // Default values (can be overridden by settings in localStorage)
+  _defaultTeamMembers: ['Ahmed', 'Luca'],
+  _defaultClients: ['Spire', 'HAUHSU'],
+  _defaultSizes: [
+    { code: 'B', range: '38-39' },
+    { code: 'C', range: '40-41' },
+    { code: 'D', range: '42-43' },
+    { code: 'E', range: '44-45' },
+  ],
+
+  // Get current settings from localStorage or defaults
+  getTeamMembers() {
+    try {
+      const stored = localStorage.getItem('insole_tracker_team_members');
+      return stored ? JSON.parse(stored) : Utils._defaultTeamMembers;
+    } catch (_) {
+      return Utils._defaultTeamMembers;
+    }
+  },
+
+  getClients() {
+    try {
+      const stored = localStorage.getItem('insole_tracker_clients');
+      return stored ? JSON.parse(stored) : Utils._defaultClients;
+    } catch (_) {
+      return Utils._defaultClients;
+    }
+  },
+
+  getSizes() {
+    try {
+      const stored = localStorage.getItem('insole_tracker_sizes');
+      return stored ? JSON.parse(stored) : Utils._defaultSizes;
+    } catch (_) {
+      return Utils._defaultSizes;
+    }
+  },
+
+  saveTeamMembers(members) {
+    localStorage.setItem('insole_tracker_team_members', JSON.stringify(members));
+  },
+
+  saveClients(clients) {
+    localStorage.setItem('insole_tracker_clients', JSON.stringify(clients));
+  },
+
+  saveSizes(sizes) {
+    localStorage.setItem('insole_tracker_sizes', JSON.stringify(sizes));
+  },
+
   STATUS_KEYWORDS: {
     lost: 'lost',
     damaged: 'damaged',
@@ -98,14 +146,14 @@ const Utils = {
     }
 
     // Check team members
-    for (const member of Utils.TEAM_MEMBERS) {
+    for (const member of Utils.getTeamMembers()) {
       if (lower.includes(member.toLowerCase())) {
         return { color: 'blue', label: location };
       }
     }
 
     // Check known clients
-    for (const client of Utils.CLIENTS) {
+    for (const client of Utils.getClients()) {
       if (lower.includes(client.toLowerCase())) {
         return { color: 'emerald', label: location };
       }
@@ -142,16 +190,10 @@ const Utils = {
   },
 
   // ── Size Labels ────────────────────────────────────────────────────────────
-  SIZE_MAP: {
-    B: '38-39',
-    C: '40-41',
-    D: '42-43',
-    E: '44-45',
-  },
-
   sizeLabel(size) {
-    const range = Utils.SIZE_MAP[size];
-    return range ? `${size} (${range})` : size || '—';
+    const sizes = Utils.getSizes();
+    const sizeObj = sizes.find(s => s.code === size);
+    return sizeObj ? `${sizeObj.code} (${sizeObj.range})` : size || '—';
   },
 
   // ── Debounce ───────────────────────────────────────────────────────────────
@@ -166,8 +208,8 @@ const Utils = {
   // ── Known locations for autocomplete ───────────────────────────────────────
   getKnownLocations(insoles) {
     const locs = new Set();
-    Utils.TEAM_MEMBERS.forEach(m => locs.add(m));
-    Utils.CLIENTS.forEach(c => locs.add(c));
+    Utils.getTeamMembers().forEach(m => locs.add(m));
+    Utils.getClients().forEach(c => locs.add(c));
     locs.add('Stock');
     locs.add('Lost');
     locs.add('Damaged');

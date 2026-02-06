@@ -35,6 +35,7 @@ document.addEventListener('alpine:init', () => {
       type: 'Core',
       size: 'C',
       location: '',
+      pairStatus: 'Both',
       dateSent: '',
       notes: '',
     },
@@ -48,6 +49,14 @@ document.addEventListener('alpine:init', () => {
     // Delete confirmation
     deleteModalOpen: false,
     deleteTarget: null,
+
+    // Settings modal
+    settingsOpen: false,
+    settings: {
+      teamMembers: [],
+      clients: [],
+      sizes: [],
+    },
 
     // Toasts
     toasts: [],
@@ -232,6 +241,7 @@ document.addEventListener('alpine:init', () => {
           type: insole.type || 'Core',
           size: insole.size || 'C',
           location: insole.location || '',
+          pairStatus: insole.pairStatus || 'Both',
           dateSent: insole.dateSent ? insole.dateSent.split('T')[0] : '',
           notes: insole.notes || '',
         };
@@ -241,6 +251,7 @@ document.addEventListener('alpine:init', () => {
           type: 'Core',
           size: 'C',
           location: '',
+          pairStatus: 'Both',
           dateSent: '',
           notes: '',
         };
@@ -269,6 +280,7 @@ document.addEventListener('alpine:init', () => {
         type: this.form.type,
         size: this.form.size,
         location: this.form.location,
+        pairStatus: this.form.pairStatus,
         dateSent: this.form.dateSent ? new Date(this.form.dateSent).toISOString() : '',
         notes: this.form.notes,
       };
@@ -382,6 +394,71 @@ document.addEventListener('alpine:init', () => {
       this.historyOpen = false;
       this.historyInsole = null;
       this.history = [];
+    },
+
+    // ── Settings ────────────────────────────────────────────────────────────
+
+    openSettings() {
+      this.settings = {
+        teamMembers: [...Utils.getTeamMembers()],
+        clients: [...Utils.getClients()],
+        sizes: JSON.parse(JSON.stringify(Utils.getSizes())),
+      };
+      this.settingsOpen = true;
+    },
+
+    closeSettings() {
+      this.settingsOpen = false;
+    },
+
+    addTeamMember() {
+      this.settings.teamMembers.push('');
+    },
+
+    removeTeamMember(idx) {
+      this.settings.teamMembers.splice(idx, 1);
+    },
+
+    addClient() {
+      this.settings.clients.push('');
+    },
+
+    removeClient(idx) {
+      this.settings.clients.splice(idx, 1);
+    },
+
+    addSize() {
+      this.settings.sizes.push({ code: '', range: '' });
+    },
+
+    removeSize(idx) {
+      this.settings.sizes.splice(idx, 1);
+    },
+
+    saveSettings() {
+      // Filter out empty entries
+      const teamMembers = this.settings.teamMembers.filter(m => m.trim());
+      const clients = this.settings.clients.filter(c => c.trim());
+      const sizes = this.settings.sizes.filter(s => s.code.trim() && s.range.trim());
+
+      if (teamMembers.length === 0) {
+        this.toast('At least one team member is required', 'error');
+        return;
+      }
+      if (sizes.length === 0) {
+        this.toast('At least one size is required', 'error');
+        return;
+      }
+
+      Utils.saveTeamMembers(teamMembers);
+      Utils.saveClients(clients);
+      Utils.saveSizes(sizes);
+
+      this.toast('Settings saved', 'success');
+      this.closeSettings();
+
+      // Re-apply filters to reflect changes
+      this.applyFilters();
     },
 
     // ── Toasts ──────────────────────────────────────────────────────────────

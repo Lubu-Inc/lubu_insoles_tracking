@@ -13,8 +13,8 @@ Clone the repo, open `index.html`, and you're up.
 1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet.
 2. Rename the first tab to **Insoles** and add this header row:
 
-   | id | serialNumber | type | size | location | notes | dateAdded | dateSent | lastModified |
-   |----|-------------|------|------|----------|-------|-----------|----------|-------------|
+   | id | serialNumber | type | size | location | pairStatus | notes | dateAdded | dateSent | lastModified |
+   |----|-------------|------|------|----------|-----------|-------|-----------|----------|-------------|
 
 3. Create a second tab called **History** with this header row:
 
@@ -81,8 +81,9 @@ insole_tracking/
 | id | Auto-generated UUID |
 | serialNumber | Optional, 4 alphanumeric chars (e.g. E46B) |
 | type | "Core" or "Advanced" |
-| size | B (38-39), C (40-41), D (42-43), E (44-45) |
+| size | B (38-39), C (40-41), D (42-43), E (44-45) — customizable in settings |
 | location | Person, client, or status (free text) |
+| pairStatus | "Both", "Left Only", or "Right Only" — defaults to "Both" |
 | notes | Free text |
 | dateAdded | ISO timestamp |
 | dateSent | ISO timestamp |
@@ -99,14 +100,14 @@ insole_tracking/
 
 ## Customization
 
-### Add team members or clients
+### Manage team members, clients, and sizes
 
-Edit `js/utils.js`:
+Click the **Settings** button (gear icon) in the top bar to:
+- Add/edit/remove team members
+- Add/edit/remove clients
+- Add/edit/remove sizes
 
-```js
-TEAM_MEMBERS: ['Ahmed', 'Luca', 'NewPerson'],
-CLIENTS: ['Spire', 'HAUHSU', 'NewClient'],
-```
+Settings are saved in your browser's localStorage and persist across sessions.
 
 ---
 

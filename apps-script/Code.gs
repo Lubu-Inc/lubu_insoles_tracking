@@ -4,7 +4,7 @@
 //
 // SETUP:
 // 1. Create a Google Sheet with two tabs: "Insoles" and "History"
-// 2. In "Insoles" tab, add header row: id | serialNumber | type | size | location | notes | dateAdded | dateSent | lastModified
+// 2. In "Insoles" tab, add header row: id | serialNumber | type | size | location | pairStatus | notes | dateAdded | dateSent | lastModified
 // 3. In "History" tab, add header row: id | insoleId | timestamp | field | oldValue | newValue
 // 4. Open Extensions > Apps Script, paste this code
 // 5. Deploy > New deployment > Web app > Execute as "Me", access "Anyone"
@@ -162,6 +162,7 @@ function handleAddInsole(data) {
       data.type || 'Core',
       data.size || 'C',
       data.location || '',
+      data.pairStatus || 'Both',  // pairStatus
       data.notes || '',
       now,                    // dateAdded
       data.dateSent || '',    // dateSent
@@ -175,8 +176,8 @@ function handleAddInsole(data) {
 
     const insole = {
       id, serialNumber: row[1], type: row[2], size: row[3],
-      location: row[4], notes: row[5], dateAdded: row[6],
-      dateSent: row[7], lastModified: row[8],
+      location: row[4], pairStatus: row[5], notes: row[6], dateAdded: row[7],
+      dateSent: row[8], lastModified: row[9],
     };
 
     return { success: true, data: insole };
@@ -212,7 +213,7 @@ function handleUpdateInsole(data) {
     headers.forEach((h, idx) => { oldObj[h] = oldRow[idx]; });
 
     // Fields that can be updated
-    const updatableFields = ['serialNumber', 'type', 'size', 'location', 'notes', 'dateSent'];
+    const updatableFields = ['serialNumber', 'type', 'size', 'location', 'pairStatus', 'notes', 'dateSent'];
     const fieldColMap = {};
     headers.forEach((h, idx) => { fieldColMap[h] = idx + 1; }); // 1-based column
 
