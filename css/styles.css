@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Insole Tracker — Custom Styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+}
+
+@keyframes highlightRow {
+  0% { background-color: rgb(251 191 36 / 0.15); }
+  100% { background-color: transparent; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+
+.animate-fade-up {
+  animation: fadeUp 0.4s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-out-right {
+  animation: slideOutRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out both;
+}
+
+.animate-toast-in {
+  animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-toast-out {
+  animation: toastOut 0.25s ease-in both;
+}
+
+.animate-highlight-row {
+  animation: highlightRow 2s ease-out both;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Staggered fade-up for stats cards */
+.animate-fade-up-1 { animation: fadeUp 0.4s ease-out 0.05s both; }
+.animate-fade-up-2 { animation: fadeUp 0.4s ease-out 0.1s both; }
+.animate-fade-up-3 { animation: fadeUp 0.4s ease-out 0.15s both; }
+.animate-fade-up-4 { animation: fadeUp 0.4s ease-out 0.2s both; }
+.animate-fade-up-5 { animation: fadeUp 0.4s ease-out 0.25s both; }
+
+/* ── Custom Scrollbar ────────────────────────────────────────────────────── */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(214 211 209 / 0.6);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(168 162 158 / 0.8);
+}
+
+/* ── Drawer Overlay ──────────────────────────────────────────────────────── */
+
+.drawer-overlay {
+  background-color: rgb(0 0 0 / 0.3);
+  backdrop-filter: blur(2px);
+}
+
+/* ── Table Styles ────────────────────────────────────────────────────────── */
+
+.table-row-hover {
+  transition: background-color 0.15s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgb(250 250 249);
+}
+
+/* ── Pill Button (for size selector) ─────────────────────────────────────── */
+
+.pill-btn {
+  transition: all 0.15s ease;
+}
+
+.pill-btn:hover:not(.pill-active) {
+  background-color: rgb(245 245 244);
+  border-color: rgb(168 162 158);
+}
+
+.pill-active {
+  background-color: rgb(41 37 36);
+  color: white;
+  border-color: rgb(41 37 36);
+}
+
+/* ── Card Radio (for type selector) ──────────────────────────────────────── */
+
+.card-radio {
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.card-radio:hover:not(.card-radio-active) {
+  border-color: rgb(168 162 158);
+  background-color: rgb(250 250 249);
+}
+
+.card-radio-active {
+  border-color: rgb(41 37 36);
+  background-color: rgb(250 250 249);
+  box-shadow: 0 0 0 1px rgb(41 37 36);
+}
+
+/* ── Toast ────────────────────────────────────────────────────────────────── */
+
+.toast {
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* ── Timeline ────────────────────────────────────────────────────────────── */
+
+.timeline-line {
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background-color: rgb(231 229 228);
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgb(168 162 158);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px rgb(231 229 228);
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-dot-created {
+  background-color: rgb(34 197 94);
+}
+
+.timeline-dot-deleted {
+  background-color: rgb(239 68 68);
+}
+
+/* ── Autocomplete Dropdown ───────────────────────────────────────────────── */
+
+.autocomplete-dropdown {
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  transition: background-color 0.1s ease;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background-color: rgb(245 245 244);
+}
+
+/* ── Focus Styles ────────────────────────────────────────────────────────── */
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: rgb(41 37 36);
+  box-shadow: 0 0 0 1px rgb(41 37 36);
+}
+
+/* ── Print Styles ────────────────────────────────────────────────────────── */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12px;
+  }
+
+  .animate-fade-up,
+  .animate-fade-up-1,
+  .animate-fade-up-2,
+  .animate-fade-up-3,
+  .animate-fade-up-4,
+  .animate-fade-up-5 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+}
+
+/* ── Offline Banner ──────────────────────────────────────────────────────── */
+
+.offline-banner {
+  background: linear-gradient(90deg, rgb(245 158 11), rgb(234 88 12));
+}
