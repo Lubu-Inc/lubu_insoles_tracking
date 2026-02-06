@@ -264,7 +264,7 @@ const Utils = {
 
   // ── Diff two insole objects for history logging ────────────────────────────
   diffInsole(oldObj, newObj) {
-    const fields = ['serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes'];
+    const fields = ['serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes', 'dateAdded'];
     const changes = [];
     for (const field of fields) {
       const oldVal = (oldObj[field] || '').toString();

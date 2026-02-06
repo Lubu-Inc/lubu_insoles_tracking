@@ -4,7 +4,7 @@
 //
 // SETUP:
 // 1. Create a Google Sheet with two tabs: "Insoles" and "History"
-// 2. In "Insoles" tab, add header row: id | serialNumber | type | size | location | enclosure | pairStatus | notes | dateAdded | dateSent | lastModified
+// 2. In "Insoles" tab, add header row: id | serialNumber | type | size | location | enclosure | pairStatus | notes | dateAdded | lastModified
 // 3. In "History" tab, add header row: id | insoleId | timestamp | field | oldValue | newValue
 // 4. Open Extensions > Apps Script, paste this code
 // 5. Deploy > New deployment > Web app > Execute as "Me", access "Anyone"
@@ -100,7 +100,7 @@ function handleGetInsoles() {
   const headers = data[0];
 
   // Validate headers match expected order
-  const expectedHeaders = ['id', 'serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes', 'dateAdded', 'dateSent', 'lastModified'];
+  const expectedHeaders = ['id', 'serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes', 'dateAdded', 'lastModified'];
   const headerMismatch = [];
   for (let i = 0; i < expectedHeaders.length; i++) {
     if (headers[i] !== expectedHeaders[i]) {
@@ -174,17 +174,16 @@ function handleAddInsole(data) {
     const id = data.id || Utilities.getUuid();
 
     const row = [
-      id,
-      data.serialNumber || '',
-      data.type || 'Core',
-      data.size || 'C',
-      data.location || '',
-      data.enclosure || 'New',    // enclosure
-      data.pairStatus || 'Both',  // pairStatus
-      data.notes || '',
-      data.dateAdded || now,  // dateAdded (use provided or default to now)
-      data.dateSent || '',    // dateSent
-      now,                    // lastModified
+      id,                         // A: id
+      data.serialNumber || '',    // B: serialNumber
+      data.type || 'Core',        // C: type
+      data.size || 'C',           // D: size
+      data.location || '',        // E: location
+      data.enclosure || 'New',    // F: enclosure
+      data.pairStatus || 'Both',  // G: pairStatus
+      data.notes || '',           // H: notes
+      data.dateAdded || now,      // I: dateAdded
+      now,                        // J: lastModified
     ];
 
     sheet.appendRow(row);
@@ -195,7 +194,7 @@ function handleAddInsole(data) {
     const insole = {
       id, serialNumber: row[1], type: row[2], size: row[3],
       location: row[4], enclosure: row[5], pairStatus: row[6], notes: row[7], dateAdded: row[8],
-      dateSent: row[9], lastModified: row[10],
+      lastModified: row[9],
     };
 
     return { success: true, data: insole };
@@ -231,7 +230,7 @@ function handleUpdateInsole(data) {
     headers.forEach((h, idx) => { oldObj[h] = oldRow[idx]; });
 
     // Fields that can be updated
-    const updatableFields = ['serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes', 'dateSent'];
+    const updatableFields = ['serialNumber', 'type', 'size', 'location', 'enclosure', 'pairStatus', 'notes'];
     const fieldColMap = {};
     headers.forEach((h, idx) => { fieldColMap[h] = idx + 1; }); // 1-based column
 

@@ -255,7 +255,6 @@ document.addEventListener('alpine:init', () => {
         enclosure: 'New',
         pairStatus: 'Both',
         dateAdded: today,
-        dateSent: '',
         notes: '',
       };
       this.drawerOpen = true;
@@ -343,7 +342,6 @@ document.addEventListener('alpine:init', () => {
         enclosure: this.form.enclosure,
         pairStatus: this.form.pairStatus,
         dateAdded: this.form.dateAdded ? new Date(this.form.dateAdded).toISOString() : Utils.nowISO(),
-        dateSent: this.form.dateSent ? new Date(this.form.dateSent).toISOString() : '',
         notes: this.form.notes,
       };
 
