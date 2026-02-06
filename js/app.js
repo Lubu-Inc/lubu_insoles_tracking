@@ -73,7 +73,7 @@ document.addEventListener('alpine:init', () => {
           const loc = (i.location || '').toLowerCase();
           if (!loc || loc === 'stock' || loc === 'available' || loc === 'returned' || loc === 'lost' || loc === 'damaged') return false;
           // Not a team member
-          for (const m of Utils.TEAM_MEMBERS) {
+          for (const m of Utils.getTeamMembers()) {
             if (loc.includes(m.toLowerCase())) return false;
           }
           return true;
