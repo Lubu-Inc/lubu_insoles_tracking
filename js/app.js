@@ -27,9 +27,8 @@ document.addEventListener('alpine:init', () => {
       dir: 'desc',
     },
 
-    // Drawer
+    // Drawer (only for adding new insoles)
     drawerOpen: false,
-    editingInsole: null,
     form: {
       serialNumber: '',
       type: 'Core',
@@ -39,6 +38,10 @@ document.addEventListener('alpine:init', () => {
       dateSent: '',
       notes: '',
     },
+
+    // Inline editing
+    editingCell: null, // { insoleId, field }
+    editValue: '',
 
     // History modal
     historyOpen: false,
@@ -233,40 +236,81 @@ document.addEventListener('alpine:init', () => {
 
     // ── Drawer ──────────────────────────────────────────────────────────────
 
-    openDrawer(insole = null) {
-      this.editingInsole = insole;
-      if (insole) {
-        this.form = {
-          serialNumber: insole.serialNumber || '',
-          type: insole.type || 'Core',
-          size: insole.size || 'C',
-          location: insole.location || '',
-          pairStatus: insole.pairStatus || 'Both',
-          dateSent: insole.dateSent ? insole.dateSent.split('T')[0] : '',
-          notes: insole.notes || '',
-        };
-      } else {
-        this.form = {
-          serialNumber: '',
-          type: 'Core',
-          size: 'C',
-          location: '',
-          pairStatus: 'Both',
-          dateSent: '',
-          notes: '',
-        };
-      }
+    openDrawer() {
+      // Only for adding new insoles
+      this.form = {
+        serialNumber: '',
+        type: 'Core',
+        size: 'C',
+        location: '',
+        pairStatus: 'Both',
+        dateSent: '',
+        notes: '',
+      };
       this.drawerOpen = true;
     },
 
     closeDrawer() {
       this.drawerOpen = false;
-      this.editingInsole = null;
+    },
+
+    // ── Inline Editing ──────────────────────────────────────────────────────
+
+    startEdit(insole, field, event) {
+      event.stopPropagation();
+      this.editingCell = { insoleId: insole.id, field };
+      this.editValue = insole[field] || '';
+    },
+
+    cancelEdit() {
+      this.editingCell = null;
+      this.editValue = '';
+    },
+
+    async saveEdit(insole) {
+      if (!this.editingCell) return;
+
+      const field = this.editingCell.field;
+      const oldValue = insole[field];
+      const newValue = this.editValue.trim();
+
+      if (oldValue === newValue) {
+        this.cancelEdit();
+        return;
+      }
+
+      this.saving = true;
+
+      try {
+        const data = { id: insole.id, [field]: newValue };
+
+        if (this.apiConfigured) {
+          await API.updateInsole(data);
+        }
+
+        // Update local state
+        const idx = this.insoles.findIndex(i => i.id === insole.id);
+        if (idx !== -1) {
+          this.insoles[idx][field] = newValue;
+          this.insoles[idx].lastModified = Utils.nowISO();
+        }
+
+        this.saveToCache();
+        this.applyFilters();
+        this.toast('Updated', 'success');
+        this.cancelEdit();
+      } catch (err) {
+        console.error('Save failed:', err);
+        this.toast('Failed to save — ' + err.message, 'error');
+      } finally {
+        this.saving = false;
+      }
     },
 
     // ── Save (Add or Update) ────────────────────────────────────────────────
 
     async saveInsole() {
+      // Only for adding new insoles
       // Validate serial
       if (this.form.serialNumber && !Utils.isValidSerial(this.form.serialNumber)) {
         this.toast('Serial number must be 4 alphanumeric characters', 'error');
@@ -286,44 +330,25 @@ document.addEventListener('alpine:init', () => {
       };
 
       try {
-        if (this.editingInsole) {
-          // Update
-          data.id = this.editingInsole.id;
+        data.id = Utils.generateId();
 
-          if (this.apiConfigured) {
-            await API.updateInsole(data);
-          }
-
-          // Update local state
-          const idx = this.insoles.findIndex(i => i.id === data.id);
-          if (idx !== -1) {
-            this.insoles[idx] = { ...this.insoles[idx], ...data, lastModified: Utils.nowISO() };
-          }
-
-          this.toast('Insole updated', 'success');
-        } else {
-          // Add
-          data.id = Utils.generateId();
-
-          if (this.apiConfigured) {
-            const result = await API.addInsole(data);
-            if (result.data) data.id = result.data.id;
-          }
-
-          data.dateAdded = Utils.nowISO();
-          data.lastModified = Utils.nowISO();
-          data._highlight = true;
-          this.insoles.push(data);
-
-          // Remove highlight after animation
-          setTimeout(() => {
-            const i = this.insoles.find(x => x.id === data.id);
-            if (i) i._highlight = false;
-          }, 2500);
-
-          this.toast('Insole added', 'success');
+        if (this.apiConfigured) {
+          const result = await API.addInsole(data);
+          if (result.data) data.id = result.data.id;
         }
 
+        data.dateAdded = Utils.nowISO();
+        data.lastModified = Utils.nowISO();
+        data._highlight = true;
+        this.insoles.push(data);
+
+        // Remove highlight after animation
+        setTimeout(() => {
+          const i = this.insoles.find(x => x.id === data.id);
+          if (i) i._highlight = false;
+        }, 2500);
+
+        this.toast('Insole added', 'success');
         this.saveToCache();
         this.applyFilters();
         this.closeDrawer();
