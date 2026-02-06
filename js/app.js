@@ -58,6 +58,7 @@ document.addEventListener('alpine:init', () => {
     settings: {
       teamMembers: [],
       clients: [],
+      investors: [],
       sizes: [],
     },
 
@@ -69,6 +70,11 @@ document.addEventListener('alpine:init', () => {
 
     get stats() {
       const all = this.insoles;
+      const sizes = {};
+      Utils.getSizes().forEach(s => {
+        sizes[s.code] = all.filter(i => i.size === s.code).length;
+      });
+
       return {
         core: all.filter(i => i.type === 'Core').length,
         advanced: all.filter(i => i.type === 'Advanced').length,
@@ -85,6 +91,7 @@ document.addEventListener('alpine:init', () => {
           const loc = (i.location || '').toLowerCase();
           return loc === 'lost' || loc === 'damaged';
         }).length,
+        sizes,
       };
     },
 
@@ -272,7 +279,12 @@ document.addEventListener('alpine:init', () => {
 
       const field = this.editingCell.field;
       const oldValue = insole[field];
-      const newValue = this.editValue.trim();
+      let newValue = this.editValue.trim();
+
+      // Uppercase serial numbers
+      if (field === 'serialNumber') {
+        newValue = newValue.toUpperCase();
+      }
 
       if (oldValue === newValue) {
         this.cancelEdit();
@@ -427,6 +439,7 @@ document.addEventListener('alpine:init', () => {
       this.settings = {
         teamMembers: [...Utils.getTeamMembers()],
         clients: [...Utils.getClients()],
+        investors: [...Utils.getInvestors()],
         sizes: JSON.parse(JSON.stringify(Utils.getSizes())),
       };
       this.settingsOpen = true;
@@ -452,6 +465,14 @@ document.addEventListener('alpine:init', () => {
       this.settings.clients.splice(idx, 1);
     },
 
+    addInvestor() {
+      this.settings.investors.push('');
+    },
+
+    removeInvestor(idx) {
+      this.settings.investors.splice(idx, 1);
+    },
+
     addSize() {
       this.settings.sizes.push({ code: '', range: '' });
     },
@@ -464,6 +485,7 @@ document.addEventListener('alpine:init', () => {
       // Filter out empty entries
       const teamMembers = this.settings.teamMembers.filter(m => m.trim());
       const clients = this.settings.clients.filter(c => c.trim());
+      const investors = this.settings.investors.filter(i => i.trim());
       const sizes = this.settings.sizes.filter(s => s.code.trim() && s.range.trim());
 
       if (teamMembers.length === 0) {
@@ -477,6 +499,7 @@ document.addEventListener('alpine:init', () => {
 
       Utils.saveTeamMembers(teamMembers);
       Utils.saveClients(clients);
+      Utils.saveInvestors(investors);
       Utils.saveSizes(sizes);
 
       this.toast('Settings saved', 'success');

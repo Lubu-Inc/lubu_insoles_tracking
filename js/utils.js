@@ -76,6 +76,7 @@ const Utils = {
   // Default values (can be overridden by settings in localStorage)
   _defaultTeamMembers: ['Ahmed', 'Luca'],
   _defaultClients: ['Spire', 'HAUHSU'],
+  _defaultInvestors: [],
   _defaultSizes: [
     { code: 'B', range: '38-39' },
     { code: 'C', range: '40-41' },
@@ -102,6 +103,15 @@ const Utils = {
     }
   },
 
+  getInvestors() {
+    try {
+      const stored = localStorage.getItem('insole_tracker_investors');
+      return stored ? JSON.parse(stored) : Utils._defaultInvestors;
+    } catch (_) {
+      return Utils._defaultInvestors;
+    }
+  },
+
   getSizes() {
     try {
       const stored = localStorage.getItem('insole_tracker_sizes');
@@ -117,6 +127,10 @@ const Utils = {
 
   saveClients(clients) {
     localStorage.setItem('insole_tracker_clients', JSON.stringify(clients));
+  },
+
+  saveInvestors(investors) {
+    localStorage.setItem('insole_tracker_investors', JSON.stringify(investors));
   },
 
   saveSizes(sizes) {
@@ -159,6 +173,13 @@ const Utils = {
       }
     }
 
+    // Check investors
+    for (const investor of Utils.getInvestors()) {
+      if (lower.includes(investor.toLowerCase())) {
+        return { color: 'purple', label: location };
+      }
+    }
+
     // Default — treat as client/external
     return { color: 'emerald', label: location };
   },
@@ -170,6 +191,7 @@ const Utils = {
       gray: 'bg-gray-50 text-gray-600 ring-gray-500/20',
       blue: 'bg-blue-50 text-blue-700 ring-blue-600/20',
       emerald: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+      purple: 'bg-purple-50 text-purple-700 ring-purple-600/20',
       stone: 'bg-stone-50 text-stone-500 ring-stone-400/20',
       amber: 'bg-amber-50 text-amber-700 ring-amber-600/20',
     };
@@ -210,6 +232,7 @@ const Utils = {
     const locs = new Set();
     Utils.getTeamMembers().forEach(m => locs.add(m));
     Utils.getClients().forEach(c => locs.add(c));
+    Utils.getInvestors().forEach(i => locs.add(i));
     locs.add('Stock');
     locs.add('Lost');
     locs.add('Damaged');
