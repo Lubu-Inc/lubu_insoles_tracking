@@ -201,12 +201,12 @@ const Utils = {
   typeBadge(type) {
     if (type === 'Advanced') {
       return {
-        classes: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+        classes: 'bg-stone-100 text-stone-900 ring-stone-400/20',
         label: 'Advanced',
       };
     }
     return {
-      classes: 'bg-stone-100 text-stone-600 ring-stone-400/20',
+      classes: 'bg-stone-100 text-stone-900 ring-stone-400/20',
       label: 'Core',
     };
   },
@@ -229,27 +229,42 @@ const Utils = {
 
   // ── Known locations for autocomplete ───────────────────────────────────────
   getKnownLocations(insoles) {
-    const locs = new Set();
-    Utils.getTeamMembers().forEach(m => locs.add(m));
-    Utils.getClients().forEach(c => locs.add(c));
-    Utils.getInvestors().forEach(i => locs.add(i));
-    locs.add('Stock');
-    locs.add('Lost');
-    locs.add('Damaged');
-    locs.add('Returned');
+    const teamMembers = Utils.getTeamMembers();
+    const clients = Utils.getClients();
+    const investors = Utils.getInvestors();
+    const others = new Set();
+
+    // Add status keywords
+    others.add('Stock');
+    others.add('Lost');
+    others.add('Damaged');
+    others.add('Returned');
+
+    // Collect other locations from insoles
     if (insoles) {
       insoles.forEach(i => {
         if (i.location && i.location.trim()) {
-          locs.add(i.location.trim());
+          const loc = i.location.trim();
+          // Skip if already in team/clients/investors
+          if (!teamMembers.includes(loc) && !clients.includes(loc) && !investors.includes(loc)) {
+            others.add(loc);
+          }
         }
       });
     }
-    return [...locs].sort();
+
+    // Sort: Team → Clients → Investors → Others
+    return [
+      ...teamMembers,
+      ...clients,
+      ...investors,
+      ...[...others].sort(),
+    ];
   },
 
   // ── Diff two insole objects for history logging ────────────────────────────
   diffInsole(oldObj, newObj) {
-    const fields = ['serialNumber', 'type', 'size', 'location', 'notes'];
+    const fields = ['serialNumber', 'type', 'size', 'location', 'inclusion', 'pairStatus', 'notes'];
     const changes = [];
     for (const field of fields) {
       const oldVal = (oldObj[field] || '').toString();
