@@ -32,6 +32,9 @@ function doGet(e) {
       case 'getHistory':
         result = handleGetHistory(e.parameter.insoleId);
         break;
+      case 'debugSheet':
+        result = handleDebugSheet();
+        break;
       // GET-based fallbacks for write operations (CORS workaround)
       case 'addInsole':
         result = handleAddInsole(JSON.parse(e.parameter.data));
@@ -119,14 +122,22 @@ function handleGetInsoles() {
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
     if (!row[0]) continue; // skip empty rows
+
+    // CRITICAL FIX: Only map up to the number of headers
+    // This prevents reading extra columns that might have old data
     const obj = {};
-    headers.forEach((h, idx) => {
-      obj[h] = row[idx];
+    for (let colIdx = 0; colIdx < headers.length; colIdx++) {
+      const header = headers[colIdx];
+      const value = row[colIdx];
+
       // Convert Date objects to ISO strings
-      if (row[idx] instanceof Date) {
-        obj[h] = row[idx].toISOString();
+      if (value instanceof Date) {
+        obj[header] = value.toISOString();
+      } else {
+        obj[header] = value;
       }
-    });
+    }
+
     insoles.push(obj);
   }
 
@@ -308,4 +319,24 @@ function addHistoryEntry(insoleId, field, oldValue, newValue) {
     oldValue,
     newValue,
   ]);
+}
+
+// ── Debug Helper ─────────────────────────────────────────────────────────────
+
+function handleDebugSheet() {
+  const sheet = getSheet('Insoles');
+  const data = sheet.getDataRange().getValues();
+
+  return {
+    success: true,
+    debug: {
+      headers: data[0],
+      headerCount: data[0].length,
+      rows: data.slice(1).map((row, idx) => ({
+        rowNumber: idx + 2,
+        columnCount: row.length,
+        values: row
+      }))
+    }
+  };
 }
