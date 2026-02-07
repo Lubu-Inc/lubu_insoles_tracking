@@ -594,45 +594,6 @@
           </div>
         </div>
 
-        <!-- Enclosure -->
-        <div>
-          <label class="block text-sm font-medium text-stone-700 mb-2">Enclosure</label>
-          <div class="flex gap-3">
-            <label class="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-medium border-2 rounded-lg cursor-pointer transition-all"
-                   :class="$store.app.form.enclosure === 'New' ? 'border-stone-800 bg-stone-50 text-stone-900' : 'border-stone-200 text-stone-600 hover:border-stone-300'">
-              <input type="radio" x-model="$store.app.form.enclosure" value="New" class="sr-only">
-              <span>New</span>
-            </label>
-            <label class="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-medium border-2 rounded-lg cursor-pointer transition-all"
-                   :class="$store.app.form.enclosure === 'Old' ? 'border-stone-800 bg-stone-50 text-stone-900' : 'border-stone-200 text-stone-600 hover:border-stone-300'">
-              <input type="radio" x-model="$store.app.form.enclosure" value="Old" class="sr-only">
-              <span>Old</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Pair Status -->
-        <div>
-          <label class="block text-sm font-medium text-stone-700 mb-2">Pair Status</label>
-          <div class="flex gap-2">
-            <label class="flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border-2 rounded-lg cursor-pointer transition-all"
-                   :class="$store.app.form.pairStatus === 'Both' ? 'border-stone-800 bg-stone-50 text-stone-900' : 'border-stone-200 text-stone-600 hover:border-stone-300'">
-              <input type="radio" x-model="$store.app.form.pairStatus" value="Both" class="sr-only">
-              <span>Both</span>
-            </label>
-            <label class="flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border-2 rounded-lg cursor-pointer transition-all"
-                   :class="$store.app.form.pairStatus === 'Left Only' ? 'border-stone-800 bg-stone-50 text-stone-900' : 'border-stone-200 text-stone-600 hover:border-stone-300'">
-              <input type="radio" x-model="$store.app.form.pairStatus" value="Left Only" class="sr-only">
-              <span>Left Only</span>
-            </label>
-            <label class="flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border-2 rounded-lg cursor-pointer transition-all"
-                   :class="$store.app.form.pairStatus === 'Right Only' ? 'border-stone-800 bg-stone-50 text-stone-900' : 'border-stone-200 text-stone-600 hover:border-stone-300'">
-              <input type="radio" x-model="$store.app.form.pairStatus" value="Right Only" class="sr-only">
-              <span>Right Only</span>
-            </label>
-          </div>
-        </div>
-
         <!-- Date Added -->
         <div>
           <label class="block text-sm font-medium text-stone-700 mb-1.5">Date Added</label>
