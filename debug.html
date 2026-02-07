@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Insole Sheet</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      overflow-x: auto;
+      border: 1px solid #ddd;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .error {
+      color: red;
+      background: #fee;
+      padding: 10px;
+      border: 1px solid #fcc;
+      margin-top: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .warning {
+      background: #fff3cd;
+      padding: 10px;
+      border: 1px solid #ffeaa7;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Debug Insole Tracker Sheet</h1>
+  <p>This tool will show you the RAW data in your Google Sheet to diagnose the corruption issue.</p>
+
+  <button onclick="debugSheet()">Run Debug</button>
+
+  <div id="output"></div>
+
+  <script src="js/api.js"></script>
+  <script>
+    async function debugSheet() {
+      const output = document.getElementById('output');
+      output.innerHTML = '<p>Loading...</p>';
+
+      try {
+        const result = await API.get('debugSheet');
+
+        if (result.success) {
+          const { headers, headerCount, rows } = result.debug;
+
+          let html = '<h2>Headers (' + headerCount + ' columns)</h2>';
+          html += '<pre>' + JSON.stringify(headers, null, 2) + '</pre>';
+
+          html += '<h2>Data Rows (' + rows.length + ' rows)</h2>';
+
+          // Check for issues
+          let warnings = [];
+          rows.forEach((row, idx) => {
+            if (row.columnCount !== headerCount) {
+              warnings.push(`Row ${row.rowNumber} has ${row.columnCount} columns but headers have ${headerCount} columns!`);
+            }
+          });
+
+          if (warnings.length > 0) {
+            html += '<div class="warning"><strong>⚠️ Issues Found:</strong><ul>';
+            warnings.forEach(w => html += '<li>' + w + '</li>');
+            html += '</ul></div>';
+          }
+
+          // Show data table
+          html += '<table><thead><tr><th>Row #</th><th>Columns</th><th>Data</th></tr></thead><tbody>';
+          rows.forEach(row => {
+            html += '<tr>';
+            html += '<td>' + row.rowNumber + '</td>';
+            html += '<td>' + row.columnCount + '</td>';
+            html += '<td><pre>' + JSON.stringify(row.values, null, 2) + '</pre></td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+
+          // Show mapping
+          html += '<h2>Column Mapping</h2>';
+          html += '<table><thead><tr><th>Column</th><th>Header</th>';
+          rows.forEach(r => html += '<th>Row ' + r.rowNumber + '</th>');
+          html += '</tr></thead><tbody>';
+
+          for (let i = 0; i < headerCount; i++) {
+            html += '<tr>';
+            html += '<td>' + String.fromCharCode(65 + i) + '</td>';
+            html += '<td><strong>' + headers[i] + '</strong></td>';
+            rows.forEach(row => {
+              const value = row.values[i];
+              html += '<td>' + (value || '<em>empty</em>') + '</td>';
+            });
+            html += '</tr>';
+          }
+          html += '</tbody></table>';
+
+          output.innerHTML = html;
+        } else {
+          output.innerHTML = '<div class="error">Error: ' + result.error + '</div>';
+        }
+      } catch (err) {
+        output.innerHTML = '<div class="error">Error: ' + err.message + '</div>';
+      }
+    }
+  </script>
+</body>
+</html>
