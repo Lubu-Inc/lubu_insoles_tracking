@@ -502,11 +502,18 @@
 
         <!-- Serial Number -->
         <div>
-          <label class="block text-sm font-medium text-stone-700 mb-1.5">Serial Number <span class="text-stone-400 font-normal">(optional)</span></label>
-          <input type="text" x-model="$store.app.form.serialNumber" maxlength="4" placeholder="e.g. E46B"
-                 class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 font-mono uppercase placeholder-stone-400">
-          <p x-show="$store.app.form.serialNumber && !Utils.isValidSerial($store.app.form.serialNumber)" x-cloak
-             class="mt-1 text-xs text-red-500">Must be exactly 4 alphanumeric characters</p>
+          <label class="block text-sm font-medium text-stone-700 mb-1.5">Serial Numbers <span class="text-stone-400 font-normal">(optional, comma-separated for batch)</span></label>
+          <textarea x-model="$store.app.form.serialNumber" rows="2" placeholder="e.g. JSK3, KAO2 (or leave empty for batch without serials)"
+                    class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 font-mono uppercase placeholder-stone-400 resize-none"></textarea>
+          <p class="mt-1 text-xs text-stone-500">Separate multiple serials with commas. Each must be 4 alphanumeric characters.</p>
+        </div>
+
+        <!-- Quantity (for batch creation) -->
+        <div>
+          <label class="block text-sm font-medium text-stone-700 mb-1.5">Quantity <span class="text-stone-400 font-normal">(for batch creation)</span></label>
+          <input type="number" x-model.number="$store.app.form.quantity" min="1" placeholder="1"
+                 class="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50">
+          <p class="mt-1 text-xs text-stone-500">Enter a number to create multiple insoles with same details. Serial numbers override this.</p>
         </div>
 
         <!-- Type (card-style radio) -->

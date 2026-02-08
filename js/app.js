@@ -262,6 +262,7 @@ document.addEventListener('alpine:init', () => {
         pairStatus: 'Both',
         dateAdded: today,
         notes: '',
+        quantity: 1, // For batch creation
       };
       this.drawerOpen = true;
     },
@@ -331,17 +332,31 @@ document.addEventListener('alpine:init', () => {
     // ── Save (Add or Update) ────────────────────────────────────────────────
 
     async saveInsole() {
-      // Only for adding new insoles
-      // Validate serial
-      if (this.form.serialNumber && !Utils.isValidSerial(this.form.serialNumber)) {
-        this.toast('Serial number must be 4 alphanumeric characters', 'error');
+      // Parse serial numbers (split by comma, newline, or space)
+      const serialInput = (this.form.serialNumber || '').trim();
+      const serialNumbers = serialInput
+        ? serialInput.split(/[\s,\n]+/).map(s => s.trim().toUpperCase()).filter(s => s)
+        : [];
+
+      // Validate serial numbers
+      for (const serial of serialNumbers) {
+        if (!Utils.isValidSerial(serial)) {
+          this.toast(`Invalid serial number: ${serial} (must be 4 alphanumeric characters)`, 'error');
+          return;
+        }
+      }
+
+      // Determine how many insoles to create
+      const quantity = serialNumbers.length > 0 ? serialNumbers.length : (this.form.quantity || 1);
+
+      if (quantity < 1) {
+        this.toast('Quantity must be at least 1', 'error');
         return;
       }
 
       this.saving = true;
 
-      const data = {
-        serialNumber: this.form.serialNumber.toUpperCase(),
+      const baseData = {
         type: this.form.type,
         size: this.form.size,
         location: this.form.location,
@@ -351,25 +366,38 @@ document.addEventListener('alpine:init', () => {
         notes: this.form.notes,
       };
 
+      const createdInsoles = [];
+
       try {
-        data.id = Utils.generateId();
+        // Create insoles
+        for (let i = 0; i < quantity; i++) {
+          const data = {
+            ...baseData,
+            serialNumber: serialNumbers[i] || '', // Use serial if provided, otherwise empty
+            id: Utils.generateId(),
+          };
 
-        if (this.apiConfigured) {
-          const result = await API.addInsole(data);
-          if (result.data) data.id = result.data.id;
+          if (this.apiConfigured) {
+            const result = await API.addInsole(data);
+            if (result.data) data.id = result.data.id;
+          }
+
+          data.lastModified = Utils.nowISO();
+          data._highlight = true;
+          this.insoles.push(data);
+          createdInsoles.push(data);
         }
-
-        data.lastModified = Utils.nowISO();
-        data._highlight = true;
-        this.insoles.push(data);
 
         // Remove highlight after animation
         setTimeout(() => {
-          const i = this.insoles.find(x => x.id === data.id);
-          if (i) i._highlight = false;
+          createdInsoles.forEach(insole => {
+            const i = this.insoles.find(x => x.id === insole.id);
+            if (i) i._highlight = false;
+          });
         }, 2500);
 
-        this.toast('Insole added', 'success');
+        const message = quantity === 1 ? 'Insole added' : `${quantity} insoles added`;
+        this.toast(message, 'success');
         this.saveToCache();
         this.applyFilters();
         this.closeDrawer();
