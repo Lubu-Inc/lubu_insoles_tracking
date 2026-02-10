@@ -100,7 +100,7 @@
 
       <!-- ── Stats Rows ── -->
       <!-- Row 1: Total, Core, Advanced -->
-      <div class="grid grid-cols-3 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-white rounded-xl border border-stone-200 p-4 animate-fade-up-1">
           <p class="text-xs font-medium text-stone-400 uppercase tracking-wider">Total</p>
           <p class="mt-1 text-2xl font-semibold text-stone-900" x-text="$store.app.insoles.length">0</p>
@@ -116,7 +116,7 @@
       </div>
 
       <!-- Row 2: With Clients, With Investors, Team Members -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-white rounded-xl border border-stone-200 p-4 animate-fade-up-4">
           <p class="text-xs font-medium text-stone-400 uppercase tracking-wider">With Clients</p>
           <p class="mt-1 text-2xl font-semibold text-emerald-600" x-text="$store.app.stats.withClients">0</p>
@@ -137,7 +137,7 @@
       </div>
 
       <!-- Row 3: Size Stats -->
-      <div class="grid grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <template x-for="(sizeObj, idx) in Utils.getSizes()" :key="sizeObj.code">
           <div class="bg-white rounded-xl border border-stone-200 p-4 animate-fade-up"
                :style="`animation-delay: ${(idx + 10) * 0.05}s`">
