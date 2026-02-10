@@ -76,22 +76,49 @@ document.addEventListener('alpine:init', () => {
         sizes[s.code] = all.filter(i => i.size === s.code).length;
       });
 
+      // Team member counts
+      const teamMembers = {};
+      Utils.getTeamMembers().forEach(member => {
+        teamMembers[member] = all.filter(i => {
+          const loc = (i.location || '').toLowerCase();
+          return loc.includes(member.toLowerCase());
+        }).length;
+      });
+
+      // Investor count
+      const withInvestors = all.filter(i => {
+        const loc = (i.location || '').toLowerCase();
+        if (!loc) return false;
+        for (const inv of Utils.getInvestors()) {
+          if (loc.includes(inv.toLowerCase())) return true;
+        }
+        return false;
+      }).length;
+
+      // Client count (not team, not investor)
+      const withClients = all.filter(i => {
+        const loc = (i.location || '').toLowerCase();
+        if (!loc) return false;
+
+        // Not a team member
+        for (const m of Utils.getTeamMembers()) {
+          if (loc.includes(m.toLowerCase())) return false;
+        }
+
+        // Not an investor
+        for (const inv of Utils.getInvestors()) {
+          if (loc.includes(inv.toLowerCase())) return false;
+        }
+
+        return true;
+      }).length;
+
       return {
         core: all.filter(i => i.type === 'Core').length,
         advanced: all.filter(i => i.type === 'Advanced').length,
-        withClients: all.filter(i => {
-          const loc = (i.location || '').toLowerCase();
-          if (!loc || loc === 'stock' || loc === 'available' || loc === 'returned' || loc === 'lost' || loc === 'damaged') return false;
-          // Not a team member
-          for (const m of Utils.getTeamMembers()) {
-            if (loc.includes(m.toLowerCase())) return false;
-          }
-          return true;
-        }).length,
-        lostDamaged: all.filter(i => {
-          const loc = (i.location || '').toLowerCase();
-          return loc === 'lost' || loc === 'damaged';
-        }).length,
+        teamMembers,
+        withInvestors,
+        withClients,
         sizes,
       };
     },

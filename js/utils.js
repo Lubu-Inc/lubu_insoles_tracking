@@ -137,27 +137,9 @@ const Utils = {
     localStorage.setItem('insole_tracker_sizes', JSON.stringify(sizes));
   },
 
-  STATUS_KEYWORDS: {
-    lost: 'lost',
-    damaged: 'damaged',
-    returned: 'returned',
-    stock: 'stock',
-    available: 'available',
-  },
-
   getLocationBadge(location) {
     if (!location) return { color: 'stone', label: 'Unassigned' };
     const lower = location.toLowerCase().trim();
-
-    if (lower === 'lost') {
-      return { color: 'red', label: location };
-    }
-    if (lower === 'damaged') {
-      return { color: 'orange', label: location };
-    }
-    if (lower === 'returned' || lower === 'stock' || lower === 'available') {
-      return { color: 'gray', label: location };
-    }
 
     // Check team members
     for (const member of Utils.getTeamMembers()) {
@@ -166,17 +148,17 @@ const Utils = {
       }
     }
 
-    // Check known clients
-    for (const client of Utils.getClients()) {
-      if (lower.includes(client.toLowerCase())) {
-        return { color: 'emerald', label: location };
-      }
-    }
-
     // Check investors
     for (const investor of Utils.getInvestors()) {
       if (lower.includes(investor.toLowerCase())) {
         return { color: 'purple', label: location };
+      }
+    }
+
+    // Check known clients
+    for (const client of Utils.getClients()) {
+      if (lower.includes(client.toLowerCase())) {
+        return { color: 'emerald', label: location };
       }
     }
 
@@ -232,33 +214,12 @@ const Utils = {
     const teamMembers = Utils.getTeamMembers();
     const clients = Utils.getClients();
     const investors = Utils.getInvestors();
-    const others = new Set();
 
-    // Add status keywords
-    others.add('Stock');
-    others.add('Lost');
-    others.add('Damaged');
-    others.add('Returned');
-
-    // Collect other locations from insoles
-    if (insoles) {
-      insoles.forEach(i => {
-        if (i.location && i.location.trim()) {
-          const loc = i.location.trim();
-          // Skip if already in team/clients/investors
-          if (!teamMembers.includes(loc) && !clients.includes(loc) && !investors.includes(loc)) {
-            others.add(loc);
-          }
-        }
-      });
-    }
-
-    // Sort: Team → Clients → Investors → Others
+    // Sort: Team → Clients → Investors
     return [
       ...teamMembers,
       ...clients,
       ...investors,
-      ...[...others].sort(),
     ];
   },
 

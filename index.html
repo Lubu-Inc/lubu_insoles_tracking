@@ -120,13 +120,24 @@
           <p class="text-xs font-medium text-stone-400 uppercase tracking-wider">With Clients</p>
           <p class="mt-1 text-2xl font-semibold text-emerald-600" x-text="$store.app.stats.withClients">0</p>
         </div>
-        <!-- Lost / Damaged -->
+        <!-- With Investors -->
         <div class="bg-white rounded-xl border border-stone-200 p-4 animate-fade-up-5">
-          <p class="text-xs font-medium text-stone-400 uppercase tracking-wider">Lost / Damaged</p>
-          <p class="mt-1 text-2xl font-semibold text-red-500" x-text="$store.app.stats.lostDamaged">0</p>
+          <p class="text-xs font-medium text-stone-400 uppercase tracking-wider">With Investors</p>
+          <p class="mt-1 text-2xl font-semibold text-purple-600" x-text="$store.app.stats.withInvestors">0</p>
         </div>
 
-        <!-- Size Stats (Row 2) -->
+        <!-- Team Member Stats (Row 2) -->
+        <template x-for="(member, idx) in Utils.getTeamMembers()" :key="member">
+          <div class="bg-white rounded-xl border border-stone-200 p-4 animate-fade-up"
+               :style="`animation-delay: ${(idx + 6) * 0.05}s`">
+            <p class="text-xs font-medium text-stone-400 uppercase tracking-wider">
+              With <span x-text="member"></span>
+            </p>
+            <p class="mt-1 text-2xl font-semibold text-blue-600" x-text="$store.app.stats.teamMembers[member] || 0">0</p>
+          </div>
+        </template>
+
+        <!-- Size Stats (Row 3+) -->
         <template x-for="(sizeObj, idx) in Utils.getSizes().slice(0, 4)" :key="sizeObj.code">
           <div class="bg-white rounded-xl border border-stone-200 p-4 animate-fade-up"
                :style="`animation-delay: ${(idx + 6) * 0.05}s`">
