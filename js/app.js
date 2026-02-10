@@ -234,7 +234,50 @@ document.addEventListener('alpine:init', () => {
 
       // Location filter
       if (this.filters.location) {
-        result = result.filter(i => i.location === this.filters.location);
+        const filter = this.filters.location;
+
+        if (filter === '__team__') {
+          // Filter for team members
+          result = result.filter(i => {
+            const loc = (i.location || '').toLowerCase();
+            if (!loc) return false;
+            for (const member of Utils.getTeamMembers()) {
+              if (loc.includes(member.toLowerCase())) return true;
+            }
+            return false;
+          });
+        } else if (filter === '__clients__') {
+          // Filter for clients (not team, not investors)
+          result = result.filter(i => {
+            const loc = (i.location || '').toLowerCase();
+            if (!loc) return false;
+
+            // Not a team member
+            for (const member of Utils.getTeamMembers()) {
+              if (loc.includes(member.toLowerCase())) return false;
+            }
+
+            // Not an investor
+            for (const investor of Utils.getInvestors()) {
+              if (loc.includes(investor.toLowerCase())) return false;
+            }
+
+            return true;
+          });
+        } else if (filter === '__investors__') {
+          // Filter for investors
+          result = result.filter(i => {
+            const loc = (i.location || '').toLowerCase();
+            if (!loc) return false;
+            for (const investor of Utils.getInvestors()) {
+              if (loc.includes(investor.toLowerCase())) return true;
+            }
+            return false;
+          });
+        } else {
+          // Exact match (legacy support)
+          result = result.filter(i => i.location === filter);
+        }
       }
 
       // Sort

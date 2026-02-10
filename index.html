@@ -185,9 +185,9 @@
           <select x-model="$store.app.filters.location" @change="$store.app.applyFilters()"
                   class="px-3 py-2 text-sm border border-stone-200 rounded-lg bg-stone-50 text-stone-700">
             <option value="">All Locations</option>
-            <template x-for="loc in $store.app.uniqueLocations" :key="loc">
-              <option :value="loc" x-text="loc"></option>
-            </template>
+            <option value="__team__">With Team Members</option>
+            <option value="__clients__">With Clients</option>
+            <option value="__investors__">With Investors</option>
           </select>
 
           <!-- Clear filters -->
