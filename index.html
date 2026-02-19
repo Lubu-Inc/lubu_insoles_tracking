@@ -421,16 +421,18 @@
                                   class="px-2 py-0.5 text-xs font-medium border border-stone-200 rounded cursor-pointer hover:bg-stone-50"
                                   x-text="$store.app.editValue"></button>
                           <div x-show="showIncMenu" class="absolute z-20 mt-1 bg-white border border-stone-200 rounded-lg shadow-lg w-24">
-                            <div @click.stop="$store.app.editValue = 'New'; $store.app.saveEdit(insole); showIncMenu = false"
-                                 class="px-3 py-2 text-sm hover:bg-stone-50 cursor-pointer">New</div>
-                            <div @click.stop="$store.app.editValue = 'Old'; $store.app.saveEdit(insole); showIncMenu = false"
-                                 class="px-3 py-2 text-sm hover:bg-stone-50 cursor-pointer">Old</div>
+                            <div @click.stop="$store.app.editValue = 'V1'; $store.app.saveEdit(insole); showIncMenu = false"
+                                 class="px-3 py-2 text-sm hover:bg-stone-50 cursor-pointer">V1</div>
+                            <div @click.stop="$store.app.editValue = 'V2'; $store.app.saveEdit(insole); showIncMenu = false"
+                                 class="px-3 py-2 text-sm hover:bg-stone-50 cursor-pointer">V2</div>
+                            <div @click.stop="$store.app.editValue = 'V3'; $store.app.saveEdit(insole); showIncMenu = false"
+                                 class="px-3 py-2 text-sm hover:bg-stone-50 cursor-pointer">V3</div>
                           </div>
                         </div>
                       </div>
                     </template>
                     <template x-if="!($store.app.editingCell?.insoleId === insole.id && $store.app.editingCell?.field === 'enclosure')">
-                      <span x-text="insole.enclosure || 'New'" class="cursor-pointer"></span>
+                      <span x-text="insole.enclosure || 'V2'" class="cursor-pointer"></span>
                     </template>
                   </td>
                   <!-- Notes -->
@@ -578,7 +580,7 @@
         <div>
           <label class="block text-sm font-medium text-stone-700 mb-2">Enclosure</label>
           <div class="flex gap-2">
-            <template x-for="inc in ['New', 'Old']" :key="inc">
+            <template x-for="inc in ['V1', 'V2', 'V3']" :key="inc">
               <button type="button" @click="$store.app.form.enclosure = inc"
                       class="pill-btn flex-1 px-3 py-2 text-sm font-medium border border-stone-200 rounded-lg text-center"
                       :class="$store.app.form.enclosure === inc ? 'pill-active' : 'text-stone-600'"

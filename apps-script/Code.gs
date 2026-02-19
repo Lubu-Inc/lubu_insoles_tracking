@@ -35,6 +35,9 @@ function doGet(e) {
       case 'debugSheet':
         result = handleDebugSheet();
         break;
+      case 'migrateEnclosures':
+        result = handleMigrateEnclosures();
+        break;
       // GET-based fallbacks for write operations (CORS workaround)
       case 'addInsole':
         result = handleAddInsole(JSON.parse(e.parameter.data));
@@ -190,7 +193,7 @@ function handleAddInsole(data) {
       data.type || 'Core',        // C: type
       data.size || 'C',           // D: size
       data.location || '',        // E: location
-      data.enclosure || 'New',    // F: enclosure
+      data.enclosure || 'V2',     // F: enclosure
       data.pairStatus || 'Both',  // G: pairStatus
       data.notes || '',           // H: notes
       data.dateAdded || now,      // I: dateAdded
@@ -319,6 +322,40 @@ function addHistoryEntry(insoleId, field, oldValue, newValue) {
     oldValue,
     newValue,
   ]);
+}
+
+// ── Migration: Old → V1, New → V2 ────────────────────────────────────────────
+
+function handleMigrateEnclosures() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(15000);
+
+  try {
+    const sheet = getSheet('Insoles');
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return { success: true, migrated: 0 };
+
+    const headers = data[0];
+    const enclosureCol = headers.indexOf('enclosure');
+    if (enclosureCol === -1) return { success: false, error: 'enclosure column not found' };
+
+    let migrated = 0;
+    const map = { 'Old': 'V1', 'New': 'V2' };
+
+    for (let i = 1; i < data.length; i++) {
+      const current = data[i][enclosureCol];
+      const replacement = map[current];
+      if (replacement) {
+        sheet.getRange(i + 1, enclosureCol + 1).setValue(replacement);
+        addHistoryEntry(data[i][0], 'enclosure', current, replacement);
+        migrated++;
+      }
+    }
+
+    return { success: true, migrated };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 // ── Debug Helper ─────────────────────────────────────────────────────────────

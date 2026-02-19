@@ -34,7 +34,7 @@ document.addEventListener('alpine:init', () => {
       type: 'Core',
       size: 'C',
       location: '',
-      enclosure: 'New',
+      enclosure: 'V2',
       pairStatus: 'Both',
       dateSent: '',
       notes: '',
@@ -155,6 +155,16 @@ document.addEventListener('alpine:init', () => {
         this.offline = true;
       });
       this.offline = !navigator.onLine;
+
+      // One-time migration: Old → V1, New → V2
+      if (this.apiConfigured && !this.offline && !localStorage.getItem('insole_tracker_migrated_enclosures')) {
+        try {
+          const res = await API.get('migrateEnclosures');
+          if (res.success) {
+            localStorage.setItem('insole_tracker_migrated_enclosures', '1');
+          }
+        } catch (_) {}
+      }
 
       // Sync from API
       if (this.apiConfigured && !this.offline) {
@@ -328,7 +338,7 @@ document.addEventListener('alpine:init', () => {
         type: 'Core',
         size: 'C',
         location: 'Ahmed',
-        enclosure: 'New',
+        enclosure: 'V2',
         pairStatus: 'Both',
         dateAdded: today,
         notes: '',
